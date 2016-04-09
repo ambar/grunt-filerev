@@ -8,6 +8,8 @@ var convert = require('convert-source-map');
 
 module.exports = function (grunt) {
   grunt.registerMultiTask('filerev', 'File revisioning based on content hashing', function () {
+    var done = this.async();
+    var revvedFilesCount = 0;
     var target = this.target;
     var filerev = grunt.filerev || {summary: {}};
     var options = this.options({
@@ -110,12 +112,16 @@ module.exports = function (grunt) {
         }
       });
 
-      grunt.log.writeln('Revved ' + chalk.cyan(el.src.length) + ' ' +
-        (el.src.length === 1 ? 'file' : 'files')
-      );
+      revvedFilesCount += el.src.length;
 
       next();
-    }, this.async());
+    }, function () {
+      grunt.log.writeln('Revved ' + chalk.cyan(revvedFilesCount) + ' ' +
+        (revvedFilesCount === 1 ? 'file' : 'files')
+      );
+
+      done();
+    });
 
     grunt.filerev = filerev;
   });
